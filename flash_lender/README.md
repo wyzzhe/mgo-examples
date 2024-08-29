@@ -1,6 +1,6 @@
 # Flash Lender Module Example
 
-This document provides an overview of a Sui Move module named `flash_lender::example`. The module defines a flash lending mechanism for any type of `Coin`, allowing users to borrow and repay funds within the same transaction. It includes several key components and functions for managing the lending process.
+This document provides an overview of a Mgo Move module named `flash_lender::example`. The module defines a flash lending mechanism for any type of `Coin`, allowing users to borrow and repay funds within the same transaction. It includes several key components and functions for managing the lending process.
 
 ## Module Overview
 
