@@ -1,10 +1,7 @@
-// Copyright (c) Mysten Labs, Inc.
-// SPDX-License-Identifier: Apache-2.0
-
-//docs::#regulate
 module examples::regcoin {
-    use sui::coin::{Self, DenyCapV2};
-    use sui::deny_list::{DenyList};
+    use mgo::coin::{Self, DenyCapV2};
+    use mgo::deny_list::{DenyList};
+    use mgo::transfer;
 
     public struct REGCOIN has drop {}
 

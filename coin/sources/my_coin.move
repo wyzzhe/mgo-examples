@@ -1,8 +1,6 @@
-// Copyright (c) Mysten Labs, Inc.
-// SPDX-License-Identifier: Apache-2.0
-
 module examples::my_coin {
-    use sui::coin::{Self, TreasuryCap};
+    use mgo::coin::{Self, TreasuryCap};
+    use mgo::transfer;
 
     // The type identifier of coin. The coin will have a type
     // tag of kind: `Coin<package_object::mycoin::MYCOIN>`
