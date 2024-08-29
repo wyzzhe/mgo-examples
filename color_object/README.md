@@ -1,6 +1,6 @@
 # Color Object Module Example
 
-This code is a module named `color_object::example` written in the Sui Move language. It defines a struct called `ColorObject` that has a unique identifier `id` and three attributes `red`, `green`, `blue`, representing the three primary colors of light.
+This code is a module named `color_object::example` written in the Mgo Move language. It defines a struct called `ColorObject` that has a unique identifier `id` and three attributes `red`, `green`, `blue`, representing the three primary colors of light.
 
 The module contains several functions:
 
