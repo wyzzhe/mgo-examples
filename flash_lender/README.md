@@ -1,51 +1,83 @@
 # Flash Lender Module Example
 
-This code is a module named `flash_lender::example` written in the Mgo Move language. It defines a struct called `FlashLender` that has a unique identifier `id` and three attributes `red`, `green`, `blue`, representing the three primary colors of light.
+This document provides an overview of a Sui Move module named `flash_lender::example`. The module defines a flash lending mechanism for any type of `Coin`, allowing users to borrow and repay funds within the same transaction. It includes several key components and functions for managing the lending process.
 
-## Module Functions
+## Module Overview
 
-### 1. Constructor Function
-**`new(red: u8, green: u8, blue: u8, ctx: &mut TxContext): ColorObject`**  
-This function creates a new `ColorObject` instance with the given RGB values and a transaction context.
+### 1. FlashLender Struct
+The `FlashLender` struct is a shared object that allows users to borrow funds. It contains the following fields:
+- **id**: A unique identifier for the flash lender.
+- **to_lend**: The amount of funds available for lending.
+- **fee**: The flat fee charged for borrowing funds.
 
-### 2. Accessor Function
-**`get_color(self: &ColorObject): (u8, u8, u8)`**  
-This function returns a tuple containing the RGB values of the `ColorObject`.
+### 2. Receipt Struct
+The `Receipt` struct records the details of a loan transaction, including:
+- **flash_lender_id**: The ID of the lender from which the funds were borrowed.
+- **repay_amount**: The total amount that must be repaid, including the fee.
 
-### 3. Update Function
-**`update(object: &mut ColorObject, red: u8, green: u8, blue: u8)`**  
-This function updates the RGB values of the `ColorObject`.
+### 3. AdminCap Struct
+The `AdminCap` struct grants administrative control over a `FlashLender`. The holder of an `AdminCap` can withdraw, deposit, and modify the lending parameters.
 
-### 4. Copy Function
-**`copy_into(from: &ColorObject, into: &mut ColorObject)`**  
-This function copies the RGB values from one `ColorObject` to another.
+## Public Functions
 
-### 5. Destruction Function
-**`delete(object: ColorObject)`**  
-This function deletes a `ColorObject` by its unique identifier.
+### 1. `new`
+**`new<T>(to_lend: Balance<T>, fee: u64, ctx: &mut TxContext): AdminCap`**  
+Creates a new `FlashLender` instance, setting the initial funds and fee. It returns an `AdminCap` for managing the lender.
 
-## Test Functions
+### 2. `loan`
+**`loan<T>(self: &mut FlashLender<T>, amount: u64, ctx: &mut TxContext): (Coin<T>, Receipt<T>)`**  
+Requests a loan of the specified `amount` from the lender. Returns the borrowed `Coin` and a `Receipt` to ensure the loan is repaid within the same transaction.
 
-### 1. Creation Test
-**`test_create()`**  
-This test function checks the creation and transfer of a `ColorObject`.
+### 3. `repay`
+**`repay<T>(self: &mut FlashLender<T>, payment: Coin<T>, receipt: Receipt<T>)`**  
+Repays the loan recorded in the `Receipt` using the `payment`. Aborts if the repayment amount or lender is incorrect.
 
-### 2. Copy Test
-**`test_copy_into()`**  
-This test function checks the copy functionality of `ColorObject`.
+## Accessor Functions
 
-### 3. Deletion Test
-**`test_delete()`**  
-This test function checks the deletion functionality of `ColorObject`.
+### 1. `fee`
+**`fee<T>(self: &FlashLender<T>): u64`**  
+Returns the current fee for the flash loan.
 
-### 4. Transfer Test
-**`test_transfer()`**  
-This test function checks the transfer functionality of `ColorObject`.
+### 2. `max_loan`
+**`max_loan<T>(self: &FlashLender<T>): u64`**  
+Returns the maximum amount available for borrowing from the lender.
 
-### 5. Immutability Test
-**`test_immutable()`**  
-This test function checks the immutability and transfer of a frozen `ColorObject`.
+### 3. `repay_amount`
+**`repay_amount<T>(self: &Receipt<T>): u64`**  
+Returns the total amount that must be repaid according to the `Receipt`.
 
-## Summary
+### 4. `flash_lender_id`
+**`flash_lender_id<T>(self: &Receipt<T>): ID`**  
+Returns the ID of the `FlashLender` object that issued the loan.
 
-Overall, this module provides a complete set of functionality for creating, manipulating, and testing `ColorObject` instances.
+## Admin Functions
+
+### 1. `withdraw`
+**`withdraw<T>(self: &mut FlashLender<T>, admin: &AdminCap, amount: u64, ctx: &mut TxContext): Coin<T>`**  
+Allows the `AdminCap` holder to withdraw funds from the lender.
+
+### 2. `deposit`
+**`deposit<T>(self: &mut FlashLender<T>, admin: &AdminCap, coin: Coin<T>)`**  
+Allows the `AdminCap` holder to deposit additional funds into the lender.
+
+### 3. `update_fee`
+**`update_fee<T>(self: &mut FlashLender<T>, admin: &AdminCap, new_fee: u64)`**  
+Allows the `AdminCap` holder to update the lending fee.
+
+## Error Codes
+
+The module defines several error codes for various failure conditions:
+- **`ELoanTooLarge`**: The loan amount exceeds the lender's available funds.
+- **`EInvalidRepaymentAmount`**: The repayment amount does not match the required amount.
+- **`ERepayToWrongLender`**: The repayment is attempted to the wrong lender.
+- **`EAdminOnly`**: An admin-only operation was attempted without valid permissions.
+- **`EWithdrawTooLarge`**: The withdrawal amount exceeds the lender's available funds.
+
+## Tests
+
+The module includes a test function `test_flash_loan` to verify the functionality of the flash lending process:
+1. **Admin creates a flash lender** with initial funds and a fee.
+2. **Alice requests and repays a loan**, ensuring the fee is added to the lender's balance.
+3. **Admin withdraws the profit** made from the fee, verifying the lender's balance and the withdrawal process.
+
+This module demonstrates a simple implementation of a flash lending system with comprehensive administrative control and error handling.
